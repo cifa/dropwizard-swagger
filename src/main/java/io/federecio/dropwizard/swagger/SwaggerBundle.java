@@ -53,8 +53,13 @@ public abstract class SwaggerBundle<T extends Configuration> implements Configur
             throw new IllegalStateException("You need to provide an instance of SwaggerBundleConfiguration");
         }
 
+        String contextPath = environment.getApplicationContext().getContextPath();
+        if (contextPath.endsWith("/")) {
+            contextPath = contextPath.substring(0, contextPath.length() - 1);
+        }
+
         ConfigurationHelper configurationHelper = new ConfigurationHelper(configuration, swaggerBundleConfiguration);
-        new AssetsBundle(Constants.SWAGGER_RESOURCES_PATH, configurationHelper.getSwaggerUriPath(), null, Constants.SWAGGER_ASSETS_NAME).run(environment);
+        new AssetsBundle(contextPath + Constants.SWAGGER_RESOURCES_PATH, configurationHelper.getSwaggerUriPath(), null, Constants.SWAGGER_ASSETS_NAME).run(environment);
 
         environment.jersey().register(new SwaggerResource(configurationHelper.getUrlPattern()));
         environment.getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
